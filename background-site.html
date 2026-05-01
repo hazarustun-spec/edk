@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXUS — Digital Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --white: #fff;
+      --black: #000;
+      --gray: rgba(255,255,255,0.5);
+      --border: rgba(255,255,255,0.1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ───────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.4rem 3rem;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 0.83rem;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-cta {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      padding: 0.5rem 1.3rem;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      background: transparent;
+      color: var(--white);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .nav-cta:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.28);
+    }
+
+    /* ── HERO ──────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #bg-mount {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* The 3D grid lives inside #bg-mount – rendered by JS */
+    #bg-grid-wrapper {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 900px;
+    }
+
+    #bg-grid {
+      display: flex;
+      flex-wrap: wrap;
+      transform: rotateX(45deg) rotateY(-10deg) rotateZ(30deg);
+      will-change: transform;
+    }
+
+    .bg-box {
+      flex-shrink: 0;
+      transition: background-color 0.55s ease;
+      background: transparent;
+    }
+
+    /* radial + edge darkening so text pops */
+    .hero-mask {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        radial-gradient(ellipse 65% 55% at 50% 50%, rgba(0,0,0,0.6) 0%, transparent 75%),
+        linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 25%, transparent 72%, rgba(0,0,0,0.9) 100%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+      max-width: 900px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.32rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.73rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--gray);
+      margin-bottom: 2rem;
+      backdrop-filter: blur(8px);
+      user-select: none;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6ee7b7;
+      animation: blink 2.2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.65); }
+    }
+
+    h1 {
+      font-size: clamp(3.2rem, 8.5vw, 7.5rem);
+      font-weight: 900;
+      line-height: 0.97;
+      letter-spacing: -0.035em;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(160deg, #fff 30%, rgba(255,255,255,0.42));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+      color: var(--gray);
+      font-weight: 400;
+      line-height: 1.65;
+      max-width: 500px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0.9rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 0.82rem 2rem;
+      border-radius: 100px;
+      background: #fff;
+      color: #000;
+      font-weight: 700;
+      font-size: 0.88rem;
+      letter-spacing: 0.03em;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 35px rgba(255,255,255,0.22);
+    }
+
+    .btn-ghost {
+      padding: 0.82rem 2rem;
+      border-radius: 100px;
+      background: transparent;
+      color: var(--gray);
+      font-weight: 500;
+      font-size: 0.88rem;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .btn-ghost:hover {
+      color: var(--white);
+      border-color: rgba(255,255,255,0.32);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.45rem;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.67rem;
+      letter-spacing: 0.14em;
+      font-weight: 600;
+      user-select: none;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 38px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.28), transparent);
+      animation: scrollAnim 1.9s ease-in-out infinite;
+      transform-origin: top;
+    }
+
+    @keyframes scrollAnim {
+      0%   { transform: scaleY(0); opacity: 0; transform-origin: top; }
+      40%  { opacity: 1; }
+      50%  { transform: scaleY(1); transform-origin: top; }
+      51%  { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); opacity: 0; transform-origin: bottom; }
+    }
+
+    /* ── MARQUEE ───────────────────────────────────────── */
+    .marquee-section {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .marquee-track {
+      display: inline-flex;
+      gap: 3.5rem;
+      animation: marquee 24s linear infinite;
+    }
+
+    .marquee-section:hover .marquee-track { animation-play-state: paused; }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .marquee-item {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .marquee-item::after {
+      content: '✦';
+      font-size: 0.48rem;
+      color: rgba(255,255,255,0.18);
+    }
+
+    /* ── FEATURES ──────────────────────────────────────── */
+    .features {
+      padding: 8rem 3rem;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.9rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      margin-bottom: 4rem;
+      max-width: 580px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .card {
+      padding: 2.4rem;
+      background: #000;
+      transition: background 0.22s;
+      cursor: default;
+    }
+
+    .card:hover { background: rgba(255,255,255,0.035); }
+
+    .card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+      letter-spacing: -0.01em;
+    }
+
+    .card-desc {
+      font-size: 0.86rem;
+      color: var(--gray);
+      line-height: 1.67;
+    }
+
+    /* ── CTA ───────────────────────────────────────────── */
+    .cta-wrap {
+      max-width: 1160px;
+      margin: 0 auto 8rem;
+      padding: 0 3rem;
+    }
+
+    .cta-section {
+      padding: 4.5rem;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .cta-section h2 {
+      font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      max-width: 460px;
+    }
+
+    /* ── FOOTER ────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-logo {
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 0.14em;
+    }
+
+    .footer-copy {
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.28);
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────────── */
+    @media (max-width: 720px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .features { padding: 5rem 1.5rem; }
+      .cta-wrap { padding: 0 1.5rem; margin-bottom: 5rem; }
+      .cta-section { padding: 2.5rem 2rem; }
+      footer { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo">NEXUS</span>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+    <button class="nav-cta">Let's talk →</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div id="bg-mount">
+      <div id="bg-grid-wrapper">
+        <div id="bg-grid"></div>
+      </div>
+    </div>
+    <div class="hero-mask"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="badge-dot"></div>
+        Available for 2026 projects
+      </div>
+      <h1>We craft<br/>digital magic.</h1>
+      <p class="hero-sub">A creative studio building bold, interactive experiences that blur the line between design and technology.</p>
+      <div class="hero-actions">
+        <button class="btn-primary">Start a project</button>
+        <button class="btn-ghost">View our work</button>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      SCROLL
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-section">
+    <div class="marquee-track" id="marquee-track"></div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features" id="services">
+    <p class="section-label">What we do</p>
+    <h2 class="section-title">From concept to pixel-perfect reality.</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon" style="background:rgba(110,231,183,.1)">🎨</div>
+        <div class="card-title">Creative Direction</div>
+        <p class="card-desc">Visual identities shaped with intention — translating your vision into a cohesive aesthetic that resonates.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:rgba(147,197,253,.1)">⚡</div>
+        <div class="card-title">Interactive Design</div>
+        <p class="card-desc">Micro-interactions, 3D scenes, and fluid motion that make interfaces feel alive and unforgettable.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:rgba(196,181,253,.1)">🚀</div>
+        <div class="card-title">Web Engineering</div>
+        <p class="card-desc">Production-grade code built on modern stacks — fast, accessible, and ready to scale from day one.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:rgba(249,168,212,.1)">🔮</div>
+        <div class="card-title">Brand Strategy</div>
+        <p class="card-desc">Positioning, naming, and messaging that give your brand a clear voice in a crowded market.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:rgba(253,230,138,.1)">📱</div>
+        <div class="card-title">Product Design</div>
+        <p class="card-desc">End-to-end UX/UI — user research, wireframes, and high-fidelity prototypes delivered fast.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:rgba(167,243,208,.1)">🌐</div>
+        <div class="card-title">Digital Campaigns</div>
+        <p class="card-desc">Launch campaigns with motion graphics, social content, and landing pages built to convert.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <div class="cta-section">
+      <h2>Ready to build something extraordinary?</h2>
+      <button class="btn-primary" style="white-space:nowrap;flex-shrink:0">Get in touch →</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-logo">NEXUS</span>
+    <span class="footer-copy">© 2026 Nexus Studio. All rights reserved.</span>
+    <span class="footer-copy">Istanbul / Remote</span>
+  </footer>
+
+  <script>
+    /* ── BackgroundBoxes (faithful reimplementation of the Framer component)
+       Props: boxSize, borderColor, rotateX, rotateY, rotateZ,
+              outDuration, colors, safetyMargin                              */
+
+    (function initBackgroundBoxes() {
+      const cfg = {
+        boxSize:      36,
+        borderColor:  'rgba(255,255,255,0.13)',
+        rotateX:      45,
+        rotateY:      -10,
+        rotateZ:      30,
+        outDuration:  0.55,
+        safetyMargin: 1.35,
+        colors: [
+          '#e2e8f0','#fca5a5','#fde68a',
+          '#a7f3d0','#93c5fd','#c4b5fd',
+          '#f9a8d4','#6ee7b7','#67e8f9'
+        ]
+      };
+
+      const mount  = document.getElementById('bg-mount');
+      const grid   = document.getElementById('bg-grid');
+
+      function build() {
+        const { width, height } = mount.getBoundingClientRect();
+        if (!width || !height) return;
+
+        /* Replicate the Framer component's diagonal-coverage calculation */
+        const cosX = Math.abs(Math.cos(cfg.rotateX * Math.PI / 180));
+        const cosY = Math.abs(Math.cos(cfg.rotateY * Math.PI / 180));
+        const compX = cosX > 0.05 ? 1 / cosX : 20;
+        const compY = cosY > 0.05 ? 1 / cosY : 20;
+        const diag  = Math.sqrt(width * width + height * height) * cfg.safetyMargin;
+        const cols  = Math.ceil((diag * compX) / cfg.boxSize) + 4;
+        const rows  = Math.ceil((diag * compY) / cfg.boxSize) + 4;
+
+        grid.style.width = (cols * cfg.boxSize) + 'px';
+
+        /* Only rebuild DOM if the count actually changed */
+        const needed = rows * cols;
+        const current = grid.children.length;
+
+        if (needed !== current) {
+          if (needed > current) {
+            const frag = document.createDocumentFragment();
+            for (let i = 0; i < needed - current; i++) {
+              const box = document.createElement('div');
+              box.className = 'bg-box';
+              box.style.width  = cfg.boxSize + 'px';
+              box.style.height = cfg.boxSize + 'px';
+              box.style.border = `1px solid ${cfg.borderColor}`;
+              box.style.transitionDuration = cfg.outDuration + 's';
+
+              box.addEventListener('mouseenter', () => {
+                box.style.backgroundColor =
+                  cfg.colors[Math.floor(Math.random() * cfg.colors.length)];
+              });
+              box.addEventListener('mouseleave', () => {
+                box.style.backgroundColor = 'transparent';
+              });
+
+              frag.appendChild(box);
+            }
+            grid.appendChild(frag);
+          } else {
+            while (grid.children.length > needed) grid.lastChild.remove();
+          }
+        }
+      }
+
+      build();
+
+      const ro = new ResizeObserver(build);
+      ro.observe(mount);
+    })();
+
+    /* ── Marquee ────────────────────────────────────────── */
+    (function initMarquee() {
+      const items = [
+        'Motion Design','Web Development','Brand Identity',
+        'UX Research','Creative Direction','Interactive Art',
+        'Product Strategy','3D Experiences','Campaign Design'
+      ];
+      const track = document.getElementById('marquee-track');
+      const doubled = [...items, ...items];
+      track.innerHTML = doubled
+        .map(t => `<span class="marquee-item">${t}</span>`)
+        .join('');
+    })();
+  </script>
+
+</body>
+</html>

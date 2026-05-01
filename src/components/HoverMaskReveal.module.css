@@ -1,0 +1,46 @@
+.wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.fullScreen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  aspect-ratio: auto;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.canvas {
+  z-index: 1;
+}
+
+/* Desktop: canvas takes over completely, hide fallback to prevent any visible overlap */
+@media (pointer: fine) {
+  .fallback { display: none; }
+}
+
+/* Mobile: no WebGL effect, fallback IS the image */
+@media (pointer: coarse) {
+  .canvas { display: none; }
+}

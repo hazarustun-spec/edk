@@ -1,0 +1,30 @@
+.landing {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.footMeta {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  padding: 0 28px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #ffffff;
+  mix-blend-mode: difference;
+  text-transform: uppercase;
+  z-index: 3;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .footMeta { padding: 0 18px; bottom: 18px; font-size: 10px; letter-spacing: 2px; }
+}
